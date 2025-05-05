@@ -1,9 +1,9 @@
 {
   "name": "r-datetime",
-  "version": "1.0.0",
+  "version": "1.0.7",
   "description": "A customizable and lightweight React Date Time Picker component with smooth UI, time zone support, and easy integration.",
   "main": "dist/index.js",
-  "module": "dist/index.esm.js",
+  "module": "dist/index.js",
   "types": "dist/types/index.d.ts",
   "files": [
     "dist"
@@ -35,6 +35,16 @@
     "webpack-cli": "^5.1.4",
     "webpack-dev-server": "^5.0.4"
   },
+  "exports": {
+  "import": "./dist/index.js",
+  "require": "./dist/index.js",
+  "types": "./dist/types/index.d.ts"
+},
+"repository": {
+  "type": "git",
+  "url": "https://github.com/pk3808/r-datetime.git"
+},
+
   "author": "Piyush",
   "license": "ISC"
 }
