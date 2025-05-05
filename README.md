@@ -1,0 +1,111 @@
+# r-datetime
+
+A customizable and lightweight **React Date Time Picker** component with a smooth UI, time zone support, and flexible configuration options. Ideal for modern React applications that require date, time, or date-time inputs with advanced features.
+
+---
+
+## 📦 Installation
+
+```bash
+npm install r-datetime
+```
+
+or
+
+```bash
+yarn add r-datetime
+```
+
+---
+
+## 🚀 Usage
+
+```jsx
+import React, { useState } from 'react';
+import DateTimePicker from 'r-datetime';
+
+const App = () => {
+  const [selectedDate, setSelectedDate] = useState(null);
+
+  return (
+    <div className="flex justify-center items-center h-screen">
+      <DateTimePicker
+        onChange={(date) => setSelectedDate(date)}
+        bodyColor="bg-gray-100"
+        textColor="text-gray-800"
+        buttonColor="bg-blue-900"
+      />
+    </div>
+  );
+};
+```
+
+---
+
+## 🎛️ Props
+
+| Prop                   | Type                                     | Default       | Description                           |
+| ---------------------- | ---------------------------------------- | ------------- | ------------------------------------- |
+| `mode`                 | `'date' \| 'time' \| 'datetime'`         | `'datetime'`  | Choose picker mode                    |
+| `onChange`             | `(date: Date) => void`                   | **required**  | Callback on date/time selection       |
+| `bodyColor`            | `string`                                 | `bg-white`    | Tailwind class for body background    |
+| `textColor`            | `string`                                 | `text-black`  | Tailwind class for text color         |
+| `buttonColor`          | `string`                                 | `bg-blue-500` | Tailwind class for button color       |
+| `locale`               | `string`                                 | `en-US`       | Locale for formatting                 |
+| `dateFormat`           | `Intl.DateTimeFormatOptions`             | `{}`          | Custom date format                    |
+| `timeFormat`           | `Intl.DateTimeFormatOptions`             | `{}`          | Custom time format                    |
+| `firstDayOfWeek`       | `0 \| 1`                                 | `0` (Sunday)  | First day of the week                 |
+| `enableRangeSelection` | `boolean`                                | `false`       | Enable date range selection           |
+| `onRangeChange`        | `(start: Date, end: Date) => void`       | `undefined`   | Callback for range change             |
+| `initialEndDate`       | `Date`                                   | `undefined`   | Preselect end date in range mode      |
+| `minDate`              | `Date`                                   | `undefined`   | Minimum selectable date               |
+| `maxDate`              | `Date`                                   | `undefined`   | Maximum selectable date               |
+| `disabledDates`        | `Date[]`                                 | `[]`          | Dates to be disabled                  |
+| `timeZone`             | `string`                                 | User's TZ     | IANA time zone (e.g., 'Europe/Paris') |
+| `showTimeZoneSelector` | `boolean`                                | `false`       | Show time zone selector dropdown      |
+| `customPresets`        | `{ label: string, value: () => Date }[]` | `[]`          | Predefined date presets               |
+
+---
+
+## 🌍 Internationalization
+
+Use `locale`, `dateFormat`, and `timeFormat` props to customize formatting according to your region.
+
+```jsx
+<DateTimePicker
+  locale="fr-FR"
+  dateFormat={{ day: '2-digit', month: 'long', year: 'numeric' }}
+  timeFormat={{ hour: '2-digit', minute: '2-digit', hour12: false }}
+/>
+```
+
+---
+
+## 🧪 Development & Testing
+
+You can test your local changes using:
+
+```bash
+npm link
+npm run build
+```
+
+Then in your test project:
+
+```bash
+npm link r-datetime
+```
+
+---
+
+## 📘 License
+
+MIT License
+
+---
+
+## 📌 Author & Repository
+
+* Author: [Piyush](https://github.com/pk3808)
+* GitHub: [https://github.com/pk3808/r-datetime](https://github.com/pk3808/r-datetime)
+* NPM: [https://www.npmjs.com/package/r-datetime](https://www.npmjs.com/package/r-datetime)
