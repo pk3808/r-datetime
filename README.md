@@ -2,7 +2,7 @@
 
 A customizable and lightweight **React Date Time Picker** component with a smooth UI, time zone support, and flexible configuration options. Ideal for modern React applications that require date, time, or date-time inputs with advanced features.
 
-![r-datetime Demo](/api/placeholder/800/400)
+![Demo](https://drive.google.com/uc?export=view&id=1O-TvSpiPB3ZUmxpqcDMz7iPZWYuBZbJH)
 
 ## 📦 Installation
 
@@ -41,7 +41,7 @@ const App = () => {
 ### Default Theme
 Clean, minimalist design that works with any application.
 
-![Default Theme](/api/placeholder/400/200)
+
 
 ```jsx
 <DateTimePicker onChange={(date) => setSelectedDate(date)} />
@@ -50,7 +50,7 @@ Clean, minimalist design that works with any application.
 ### Light Theme with Custom Colors
 Customize your picker with any color palette that matches your brand.
 
-![Light Theme Custom](/api/placeholder/400/200)
+![Light Theme Custom](https://drive.google.com/uc?export=view&id=1-fJHnCFuPoBQmiOVY4OEJMW3GMEnWi6M)
 
 ```jsx
 <DateTimePicker
@@ -82,7 +82,6 @@ Perfect for dark-mode interfaces or night-time usage.
 ### Date-Time Mode (Default)
 Select both date and time in one component.
 
-![DateTime Mode](/api/placeholder/400/200)
 
 ```jsx
 <DateTimePicker onChange={(date) => setSelectedDate(date)} />
@@ -91,7 +90,7 @@ Select both date and time in one component.
 ### Date Only Mode
 When you only need to collect a date.
 
-![Date Only Mode](/api/placeholder/400/200)
+![Date Only Mode](https://drive.google.com/uc?export=view&id=1DD5xfbW8Hjl7k1urOODGpdo8t0BKP8lZ)
 
 ```jsx
 <DateTimePicker
@@ -104,7 +103,7 @@ When you only need to collect a date.
 ### Time Only Mode
 For time selection without dates.
 
-![Time Only Mode](/api/placeholder/400/200)
+![Time Only Mode](https://drive.google.com/uc?export=view&id=1Y46AK841Oj4Xc72VJhYzxCLFMad_y02k)
 
 ```jsx
 <DateTimePicker
@@ -118,7 +117,7 @@ For time selection without dates.
 
 Support for multiple languages and date formats to meet global user needs.
 
-![French Locale](/api/placeholder/400/200)
+![French Locale](https://drive.google.com/uc?export=view&id=150kRYcA7_zEl4onjOQmfqUycgTJI5jr0)
 
 ```jsx
 <DateTimePicker
