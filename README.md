@@ -2,7 +2,7 @@
 
 A customizable and lightweight **React Date Time Picker** component with a smooth UI, time zone support, and flexible configuration options. Ideal for modern React applications that require date, time, or date-time inputs with advanced features.
 
-![r-datetime Demo](/api/placeholder/800/400)
+![Demo](https://drive.google.com/uc?export=view&id=1O-TvSpiPB3ZUmxpqcDMz7iPZWYuBZbJH)
 
 ## 📦 Installation
 
@@ -41,7 +41,7 @@ const App = () => {
 ### Default Theme
 Clean, minimalist design that works with any application.
 
-![Default Theme](https://drive.google.com/uc?export=view&id=1O-TvSpiPB3ZUmxpqcDMz7iPZWYuBZbJH)
+
 
 ```jsx
 <DateTimePicker onChange={(date) => setSelectedDate(date)} />
