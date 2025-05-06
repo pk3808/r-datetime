@@ -82,7 +82,6 @@ Perfect for dark-mode interfaces or night-time usage.
 ### Date-Time Mode (Default)
 Select both date and time in one component.
 
-![DateTime Mode](/api/placeholder/400/200)
 
 ```jsx
 <DateTimePicker onChange={(date) => setSelectedDate(date)} />
@@ -118,7 +117,7 @@ For time selection without dates.
 
 Support for multiple languages and date formats to meet global user needs.
 
-![French Locale](https://drive.google.com/file/d/150kRYcA7_zEl4onjOQmfqUycgTJI5jr0/view?usp=drive_link)
+![French Locale](https://drive.google.com/uc?export=view&id=150kRYcA7_zEl4onjOQmfqUycgTJI5jr0)
 
 ```jsx
 <DateTimePicker
