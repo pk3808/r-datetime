@@ -176,7 +176,7 @@ function DateTimePicker({
     <div className="relative" ref={pickerRef}>
       <div
         ref={inputRef}
-        className={`flex items-center border border-gray-300 rounded-md px-3 py-2 text-sm ${bodyColor} ${textColor} ${className}`}
+        className={`flex items-center  border border-gray-300 rounded-md px-3 py-2 text-sm ${bodyColor} ${textColor} ${className}`}
         role="group"
         aria-label="Date and time selection"
       >
@@ -278,7 +278,7 @@ function DateTimePicker({
             {mode !== "time" && (
               <div className="mb-3 flex flex-wrap justify-between">
                 <button
-                  className={`py-1 px-3 text-xs rounded border ${buttonColor.replace(
+                  className={`py-1 w-[30%] px-2 text-xs rounded border ${buttonColor.replace(
                     "bg-",
                     "border-"
                   )} hover:${buttonColor} hover:font-bold transition-all duration-150 ${textColor}`}
@@ -291,7 +291,7 @@ function DateTimePicker({
                   Tomorrow
                 </button>
                 <button
-                  className={`py-1 px-3 text-xs rounded border ${buttonColor.replace(
+                  className={`py-1 px-2 w-[30%] text-xs rounded border ${buttonColor.replace(
                     "bg-",
                     "border-"
                   )} hover:${buttonColor} hover:font-bold transition-all duration-150 ${textColor}`}
@@ -304,7 +304,7 @@ function DateTimePicker({
                   Next Week
                 </button>
                 <button
-                  className={`py-1 px-3 text-xs rounded border ${buttonColor.replace(
+                  className={`py-1 px-2 w-[35%] text-xs rounded border ${buttonColor.replace(
                     "bg-",
                     "border-"
                   )} hover:${buttonColor} hover:font-bold transition-all duration-150 ${textColor}`}
