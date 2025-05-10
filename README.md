@@ -139,6 +139,7 @@ Support for multiple languages and date formats to meet global user needs.
 | `bodyColor`            | `string`                                 | `bg-white`    | Tailwind class for body background    |
 | `textColor`            | `string`                                 | `text-black`  | Tailwind class for text color         |
 | `buttonColor`          | `string`                                 | `bg-blue-500` | Tailwind class for button color       |
+| `classname`            | `string`                                 | `py-4`        | customized layout of date/time selector       |
 | `iconColor`            | `string`                                 | `text-blue-500` | Tailwind class for icon color        |
 | `locale`               | `string`                                 | `en-US`       | Locale for formatting                 |
 | `dateFormat`           | `Intl.DateTimeFormatOptions`             | `{}`          | Custom date format                    |
