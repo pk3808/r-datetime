@@ -9,7 +9,7 @@ type DateTimePickerProps = {
   bodyColor?: string;
   textColor?: string;
   buttonColor?: string;
-  iconColor?: string; // New prop for icon color
+  iconColor?: string;
   mode?: "datetime" | "date" | "time";
   locale?: string;
   dateFormat?: Intl.DateTimeFormatOptions;
@@ -23,6 +23,7 @@ type DateTimePickerProps = {
   maxDate?: Date;
   timeZone?: string;
   showTimeZoneSelector?: boolean;
+  showPresets?: boolean; // New prop to control preset buttons
   customPresets?: Array<{
     label: string;
     value: Date | (() => Date);
@@ -36,7 +37,7 @@ function DateTimePicker({
   bodyColor = "bg-white",
   textColor = "text-gray-700",
   buttonColor = "bg-purple-700",
-  iconColor = "", // Default to empty, will use textColor if not provided
+  iconColor = "",
   mode = "datetime",
   locale = "en-US",
   dateFormat = {
@@ -50,6 +51,7 @@ function DateTimePicker({
     hour12: true,
   },
   firstDayOfWeek = 0,
+  showPresets = true, // Default to true for backward compatibility
 }: DateTimePickerProps) {
   const [date, setDate] = useState(initialDate);
   const [isOpen, setIsOpen] = useState(false);
@@ -176,7 +178,7 @@ function DateTimePicker({
     <div className="relative" ref={pickerRef}>
       <div
         ref={inputRef}
-        className={`flex items-center justify-center items-center  border border-gray-300 rounded-md px-3 py-2 text-sm ${bodyColor} ${textColor} ${className}`}
+        className={`flex items-center  border border-gray-300 rounded-md px-3 py-2 text-sm ${bodyColor} ${textColor} ${className}`}
         role="group"
         aria-label="Date and time selection"
       >
@@ -227,8 +229,9 @@ function DateTimePicker({
           className={`absolute ${
             position === "bottom" ? "mt-1" : "mb-1 bottom-full"
           } border border-gray-300 rounded-md shadow-lg z-10 w-72 ${
-            mode === "date" || mode === "datetime" ? "h-92" : "h-52"
-          } overflow-y-auto overflow-x-hidden ${bodyColor}`}
+            // Reduced height for more compact design
+            mode === "date" || mode === "datetime" ? "h-80" : "h-52"
+          } overflow-hidden ${bodyColor}`}
         >
           <div className="flex border-b border-gray-300">
             {mode !== "time" && (
@@ -257,74 +260,78 @@ function DateTimePicker({
             )}
           </div>
 
-          {activeView === "date" ? (
-            <DatePicker
-              date={date}
-              onChange={handleDateChange}
-              textColor={textColor}
-              buttonColor={buttonColor}
-              bodyColor={bodyColor}
-            />
-          ) : (
-            <TimePicker
-              date={date}
-              onChange={handleTimeChange}
-              textColor={textColor}
-              bodyColor={bodyColor}
-            />
-          )}
+          <div className="flex flex-col h-full">
+            <div className="flex-1 overflow-y-auto">
+              {activeView === "date" ? (
+                <DatePicker
+                  date={date}
+                  onChange={handleDateChange}
+                  textColor={textColor}
+                  buttonColor={buttonColor}
+                  bodyColor={bodyColor}
+                />
+              ) : (
+                <TimePicker
+                  date={date}
+                  onChange={handleTimeChange}
+                  textColor={textColor}
+                  bodyColor={bodyColor}
+                />
+              )}
+            </div>
 
-          <div className="p-2 border-t border-gray-300">
-            {mode !== "time" && (
-              <div className="mb-3 flex flex-wrap justify-between">
+            <div className="flex-shrink-0 p-2 border-t border-gray-300">
+              {mode !== "time" && showPresets && (
+                <div className="mb-3 flex flex-wrap justify-between">
+                  <button
+                    className={`py-1 w-[30%] px-2 text-xs rounded border ${buttonColor.replace(
+                      "bg-",
+                      "border-"
+                    )} hover:${buttonColor} hover:font-bold transition-all duration-150 ${textColor}`}
+                    onClick={() => {
+                      const tomorrow = new Date();
+                      tomorrow.setDate(tomorrow.getDate() + 1);
+                      handleDateChange(tomorrow);
+                    }}
+                  >
+                    Tomorrow
+                  </button>
+                  <button
+                    className={`py-1 px-2 w-[30%] text-xs rounded border ${buttonColor.replace(
+                      "bg-",
+                      "border-"
+                    )} hover:${buttonColor} hover:font-bold transition-all duration-150 ${textColor}`}
+                    onClick={() => {
+                      const nextWeek = new Date();
+                      nextWeek.setDate(nextWeek.getDate() + 7);
+                      handleDateChange(nextWeek);
+                    }}
+                  >
+                    Next Week
+                  </button>
+                  <button
+                    className={`py-1 px-2 w-[35%] text-xs rounded border ${buttonColor.replace(
+                      "bg-",
+                      "border-"
+                    )} hover:${buttonColor} hover:font-bold transition-all duration-150 ${textColor}`}
+                    onClick={() => {
+                      const nextMonth = new Date();
+                      nextMonth.setMonth(nextMonth.getMonth() + 1);
+                      handleDateChange(nextMonth);
+                    }}
+                  >
+                    Next Month
+                  </button>
+                </div>
+              )}
+              <div className="flex justify-end">
                 <button
-                  className={`py-1 w-[30%] px-2 text-xs rounded border ${buttonColor.replace(
-                    "bg-",
-                    "border-"
-                  )} hover:${buttonColor} hover:font-bold transition-all duration-150 ${textColor}`}
-                  onClick={() => {
-                    const tomorrow = new Date();
-                    tomorrow.setDate(tomorrow.getDate() + 1);
-                    handleDateChange(tomorrow);
-                  }}
+                  className={`px-4 py-1 rounded-md text-white text-sm ${buttonColor}`}
+                  onClick={closePicker}
                 >
-                  Tomorrow
-                </button>
-                <button
-                  className={`py-1 px-2 w-[30%] text-xs rounded border ${buttonColor.replace(
-                    "bg-",
-                    "border-"
-                  )} hover:${buttonColor} hover:font-bold transition-all duration-150 ${textColor}`}
-                  onClick={() => {
-                    const nextWeek = new Date();
-                    nextWeek.setDate(nextWeek.getDate() + 7);
-                    handleDateChange(nextWeek);
-                  }}
-                >
-                  Next Week
-                </button>
-                <button
-                  className={`py-1 px-2 w-[35%] text-xs rounded border ${buttonColor.replace(
-                    "bg-",
-                    "border-"
-                  )} hover:${buttonColor} hover:font-bold transition-all duration-150 ${textColor}`}
-                  onClick={() => {
-                    const nextMonth = new Date();
-                    nextMonth.setMonth(nextMonth.getMonth() + 1);
-                    handleDateChange(nextMonth);
-                  }}
-                >
-                  Next Month
+                  Done
                 </button>
               </div>
-            )}
-            <div className="flex justify-end">
-              <button
-                className={`px-4 py-1 rounded-md text-white text-sm ${buttonColor}`}
-                onClick={closePicker}
-              >
-                Done
-              </button>
             </div>
           </div>
         </div>
@@ -539,11 +546,11 @@ function DatePicker({
 
   const renderYearGrid = () => {
     return (
-      <div className="grid grid-cols-4 gap-2 p-2 h-64 overflow-y-auto">
+      <div className="grid grid-cols-4 gap-2 p-2 h-48 overflow-y-auto">
         {yearRange.map((year) => (
           <div
             key={year}
-            className={`h-10 flex items-center justify-center rounded cursor-pointer text-sm transition-all duration-200
+            className={`h-8 flex items-center justify-center rounded cursor-pointer text-sm transition-all duration-200
               ${
                 year === viewDate.getFullYear()
                   ? `${buttonColor} text-white`
@@ -560,11 +567,11 @@ function DatePicker({
 
   const renderMonthGrid = () => {
     return (
-      <div className="grid grid-cols-3 gap-3 p-4">
+      <div className="grid grid-cols-3 gap-2 p-3 h-48 overflow-y-auto">
         {monthNamesShort.map((month, index) => (
           <div
             key={month}
-            className={`h-12 flex items-center justify-center rounded-lg cursor-pointer text-sm font-medium transition-all duration-200
+            className={`h-8 flex items-center justify-center rounded cursor-pointer text-sm font-medium transition-all duration-200
               ${
                 index === viewDate.getMonth()
                   ? `${buttonColor} text-white`
@@ -582,8 +589,8 @@ function DatePicker({
   const renderSelector = () => {
     if (showYearSelector) {
       return (
-        <div className="px-2">
-          <div className={`text-center text-sm ${textColor} mb-2 font-medium`}>
+        <div>
+          <div className={`text-center text-sm ${textColor} mb-2 font-medium p-2`}>
             Select Year
           </div>
           {renderYearGrid()}
@@ -593,8 +600,8 @@ function DatePicker({
 
     if (showMonthSelector) {
       return (
-        <div className="px-2">
-          <div className={`text-center text-sm ${textColor} mb-2 font-medium`}>
+        <div>
+          <div className={`text-center text-sm ${textColor} mb-2 font-medium p-2`}>
             Select Month
           </div>
           {renderMonthGrid()}
@@ -603,7 +610,7 @@ function DatePicker({
     }
 
     return (
-      <>
+      <div className="p-3">
         <div className="grid grid-cols-7 gap-1 mb-2">
           {["Su", "Mo", "Tu", "We", "Th", "Fr", "Sa"].map((day) => (
             <div
@@ -615,8 +622,10 @@ function DatePicker({
           ))}
         </div>
 
-        <div className="grid grid-cols-7 gap-1">{renderCalendar()}</div>
-      </>
+        <div className="grid grid-cols-7 gap-1 max-h-48 overflow-y-auto">
+          {renderCalendar()}
+        </div>
+      </div>
     );
   };
 
@@ -625,11 +634,11 @@ function DatePicker({
     : "hover:text-indigo-600";
 
   return (
-    <div className="p-4">
-      <div className="flex justify-between items-center mb-4">
+    <div>
+      <div className="flex justify-between items-center p-3 border-b border-gray-200">
         <button
           onClick={handlePrevMonth}
-          className={`${textColor} ${hoverTextColor}`}
+          className={`${textColor} ${hoverTextColor} p-1`}
         >
           &lt;
         </button>
@@ -649,7 +658,7 @@ function DatePicker({
         </div>
         <button
           onClick={handleNextMonth}
-          className={`${textColor} ${hoverTextColor}`}
+          className={`${textColor} ${hoverTextColor} p-1`}
         >
           &gt;
         </button>
@@ -724,7 +733,6 @@ function TimePicker({
     }
   };
 
-  // Fix: Apply text color directly to the select element to ensure visibility in dark mode
   const selectClassName = `p-2 border rounded text-center appearance-none w-16 ${textColor} ${bodyColor}`;
 
   return (
@@ -734,7 +742,6 @@ function TimePicker({
           value={displayHours}
           onChange={(e) => handleHourChange(parseInt(e.target.value))}
           className={selectClassName}
-          // style={{ color: 'textColor' }}
         >
           {Array.from({ length: 12 }, (_, i) => i + 1).map((hour) => (
             <option key={hour} value={hour} className={textColor}>
@@ -749,7 +756,6 @@ function TimePicker({
           value={minutes}
           onChange={(e) => handleMinuteChange(parseInt(e.target.value))}
           className={selectClassName}
-          // style={{ color: 'currentColor' }}
         >
           {Array.from({ length: 60 }, (_, i) => i).map((minute) => (
             <option key={minute} value={minute} className={textColor}>
@@ -762,7 +768,6 @@ function TimePicker({
           value={period}
           onChange={(e) => handlePeriodChange(e.target.value)}
           className={selectClassName}
-          // style={{ color: 'currentColor' }}
         >
           <option value="AM" className={textColor}>AM</option>
           <option value="PM" className={textColor}>PM</option>
