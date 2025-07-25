@@ -1,5 +1,5 @@
-import React, { act } from "react";
-import { useState, useRef, useEffect } from "react";
+import React, { useState, useRef, useEffect } from "react";
+import { createPortal } from 'react-dom';
 import { Clock, CalendarDays } from "lucide-react";
 import { ChevronRight } from 'lucide-react';
 
@@ -69,7 +69,6 @@ function DateTimePicker({
   const modalRef = useRef<HTMLDivElement>(null);
 
   const actualIconColor = iconColor || textColor;
-  const [position, setPosition] = useState<"bottom" | "top">("bottom");
 
   const formattedDate = new Intl.DateTimeFormat(locale, dateFormat).format(
     date
@@ -100,37 +99,46 @@ function DateTimePicker({
     }
   }, [date, onChange, initialDate]);
 
+  // This effect now correctly positions the modal using a portal
   useEffect(() => {
-    if (isOpen) {
-      setTimeout(() => {
-        if (inputRef.current && modalRef.current) {
-          const inputRect = inputRef.current.getBoundingClientRect();
-          const modalHeight = modalRef.current.offsetHeight;
-          const viewportHeight = window.innerHeight;
+    const calculatePosition = () => {
+      if (!isOpen || !inputRef.current || !modalRef.current) return;
 
-          const spaceBelow = viewportHeight - inputRect.bottom;
-          const spaceAbove = inputRect.top;
+      const inputRect = inputRef.current.getBoundingClientRect();
+      const modalRect = modalRef.current.getBoundingClientRect();
+      const viewportHeight = window.innerHeight;
 
-          if (spaceBelow < modalHeight && spaceAbove > spaceBelow) {
-            setPosition("top");
-          } else {
-            setPosition("bottom");
-          }
+      const spaceBelow = viewportHeight - inputRect.bottom;
+      const spaceAbove = inputRect.top;
 
-          // Dynamically set z-index for the picker
-          if (modalRef.current) {
-            modalRef.current.style.zIndex = "9999"; // Ensure it's on top
-          }
-        }
-      }, 10);
-    } else {
-      // Reset z-index when the picker is closed
-      if (modalRef.current) {
-        modalRef.current.style.zIndex = "1";
+      const modal = modalRef.current;
+      modal.style.position = 'fixed';
+      modal.style.left = `${inputRect.left}px`;
+      modal.style.zIndex = '9999999'; // Ensure it's on top
+
+      // Decide whether to render above or below the input
+      if (spaceBelow < modalRect.height && spaceAbove > modalRect.height) {
+        modal.style.top = `${inputRect.top - modalRect.height - 4}px`;
+      } else {
+        modal.style.top = `${inputRect.bottom + 4}px`;
       }
-    }
-  }, [isOpen, activeView]);
+    };
 
+    if (isOpen) {
+      // Defer position calculation until after the modal has rendered
+      requestAnimationFrame(() => {
+        calculatePosition();
+        // Add listeners to reposition on scroll or resize
+        window.addEventListener('scroll', calculatePosition, true);
+        window.addEventListener('resize', calculatePosition);
+      });
+
+      return () => {
+        window.removeEventListener('scroll', calculatePosition, true);
+        window.removeEventListener('resize', calculatePosition);
+      };
+    }
+  }, [isOpen, activeView]); // Re-run if view changes, as modal height might change
 
   const handleDateChange = (newDate: Date) => {
     const updatedDate = new Date(date);
@@ -189,7 +197,7 @@ function DateTimePicker({
     <div className="relative" ref={pickerRef}>
       <div
         ref={inputRef}
-        className={`flex items-center justify-center   border border-gray-300 rounded-md px-3 py-2 text-sm ${bodyColor} ${textColor} ${className}`}
+        className={`flex items-center justify-center border border-gray-300 rounded-md px-3 py-2 text-sm ${bodyColor} ${textColor} ${className}`}
         role="group"
         aria-label="Date and time selection"
       >
@@ -234,19 +242,19 @@ function DateTimePicker({
         )}
       </div>
 
-      {isOpen && (
+      {isOpen && createPortal(
         <div
           ref={modalRef}
-          className={`absolute ${position === "bottom" ? "mt-1" : "mb-1 bottom-full"
-            } border border-gray-300 rounded-md shadow-lg z-10  w-72 ${activeView === "date" ? "h-82" : "h-48"
+          // Removed absolute positioning classes, now handled by inline styles
+          className={`border border-gray-300 rounded-md shadow-lg w-72 ${activeView === "date" ? "h-82" : "h-48"
             } overflow-y-auto overflow-x-hidden ${bodyColor}`}
         >
           <div className="flex border-b border-gray-300 sticky top-0 bg-white z-20">
             {mode !== "time" && (
               <button
                 className={`flex-1 py-2 text-center ${textColor} ${activeView === "date"
-                  ? `${activeTabColor} font-medium border-b-2 ${activeTabBorderColor}`
-                  : textColor
+                    ? `${activeTabColor} font-medium border-b-2 ${activeTabBorderColor}`
+                    : textColor
                   }`}
                 onClick={() => setActiveView("date")}
               >
@@ -256,8 +264,8 @@ function DateTimePicker({
             {mode !== "date" && (
               <button
                 className={`flex-1 py-2 text-center ${textColor} ${activeView === "time"
-                  ? `${activeTabColor} font-medium border-b-2 ${activeTabBorderColor}`
-                  : textColor
+                    ? `${activeTabColor} font-medium border-b-2 ${activeTabBorderColor}`
+                    : textColor
                   }`}
                 onClick={() => setActiveView("time")}
               >
@@ -297,8 +305,8 @@ function DateTimePicker({
                     "bg-",
                     "border-"
                   )} transition-all duration-150 ${textColor}
-                                    ${hoverColor ? `hover:${hoverColor}` : 'hover:bg-purple-50'} 
-                                    ${onHoverTextColor ? `hover:${onHoverTextColor}` : ''}`}
+                                        ${hoverColor ? `hover:${hoverColor}` : 'hover:bg-purple-50'} 
+                                        ${onHoverTextColor ? `hover:${onHoverTextColor}` : ''}`}
                   onClick={() => {
                     const tomorrow = new Date();
                     tomorrow.setDate(tomorrow.getDate() + 1);
@@ -312,8 +320,8 @@ function DateTimePicker({
                     "bg-",
                     "border-"
                   )} transition-all duration-150 ${textColor}
-                                    ${hoverColor ? `hover:${hoverColor}` : 'hover:bg-purple-50'} 
-                                    ${onHoverTextColor ? `hover:${onHoverTextColor}` : ''}`}
+                                        ${hoverColor ? `hover:${hoverColor}` : 'hover:bg-purple-50'} 
+                                        ${onHoverTextColor ? `hover:${onHoverTextColor}` : ''}`}
                   onClick={() => {
                     const nextWeek = new Date();
                     nextWeek.setDate(nextWeek.getDate() + 7);
@@ -328,8 +336,8 @@ function DateTimePicker({
                     "bg-",
                     "border-"
                   )} transition-all duration-150 ${textColor}
-                                    ${hoverColor ? `hover:${hoverColor}` : 'hover:bg-purple-50'} 
-                                    ${onHoverTextColor ? `hover:${onHoverTextColor}` : ''}`}
+                                        ${hoverColor ? `hover:${hoverColor}` : 'hover:bg-purple-50'} 
+                                        ${onHoverTextColor ? `hover:${onHoverTextColor}` : ''}`}
                   onClick={() => {
                     const nextMonth = new Date();
                     nextMonth.setMonth(nextMonth.getMonth() + 1);
@@ -350,7 +358,8 @@ function DateTimePicker({
               </button>
             </div>
           </div>
-        </div>
+        </div>,
+        document.body
       )}
     </div>
   );
@@ -772,7 +781,7 @@ function TimePicker({
   const hoverBgClass = hoverColor ? `hover:${hoverColor}` : 'hover:bg-gray-200';
   const hoverTextClass = onHoverTextColor ? `hover:${onHoverTextColor}` : 'hover:text-blue-600';
   const hoverClasses = `${hoverBgClass} ${hoverTextClass}`;
- 
+
 
   const selectClassName = `p-2 focus:outline-none focus:ring-2 focus:ring-transparent border rounded-lg text-center appearance-none w-24 text-lg font-medium ${textColor} ${bodyColor} ${hoverClasses} cursor-pointer transition-colors duration-300 ease-in-out`;
 
