@@ -132,28 +132,31 @@ Support for multiple languages and date formats to meet global user needs.
 
 ## 🎛️ Props
 
-| Prop                   | Type                                     | Default       | Description                           |
-| ---------------------- | ---------------------------------------- | ------------- | ------------------------------------- |
-| `mode`                 | `'date' \| 'time' \| 'datetime'`         | `'datetime'`  | Choose picker mode                    |
-| `onChange`             | `(date: Date) => void`                   | **required**  | Callback on date/time selection       |
-| `bodyColor`            | `string`                                 | `bg-white`    | Tailwind class for body background    |
-| `textColor`            | `string`                                 | `text-black`  | Tailwind class for text color         |
-| `buttonColor`          | `string`                                 | `bg-blue-500` | Tailwind class for button color       |
-| `classname`            | `string`                                 | `py-4`        | customized layout of date/time selector       |
-| `iconColor`            | `string`                                 | `text-blue-500` | Tailwind class for icon color        |
-| `locale`               | `string`                                 | `en-US`       | Locale for formatting                 |
-| `dateFormat`           | `Intl.DateTimeFormatOptions`             | `{}`          | Custom date format                    |
-| `timeFormat`           | `Intl.DateTimeFormatOptions`             | `{}`          | Custom time format                    |
-| `firstDayOfWeek`       | `0 \| 1`                                 | `0` (Sunday)  | First day of the week                 |
-| `enableRangeSelection` | `boolean`                                | `false`       | Enable date range selection           |
-| `onRangeChange`        | `(start: Date, end: Date) => void`       | `undefined`   | Callback for range change             |
-| `initialEndDate`       | `Date`                                   | `undefined`   | Preselect end date in range mode      |
-| `minDate`              | `Date`                                   | `undefined`   | Minimum selectable date               |
-| `maxDate`              | `Date`                                   | `undefined`   | Maximum selectable date               |
-| `disabledDates`        | `Date[]`                                 | `[]`          | Dates to be disabled                  |
-| `timeZone`             | `string`                                 | User's TZ     | IANA time zone (e.g., 'Europe/Paris') |
-| `showTimeZoneSelector` | `boolean`                                | `false`       | Show time zone selector dropdown      |
-| `customPresets`        | `{ label: string, value: () => Date }[]` | `[]`          | Predefined date presets               |
+| Prop                   | Type                                     | Default         | Description                             |
+| ---------------------- | ---------------------------------------- | --------------- | --------------------------------------- |
+| `mode`                 | `'date' \| 'time' \| 'datetime'`         | `'datetime'`    | Choose picker mode                      |
+| `onChange`             | `(date: Date) => void`                   | **required**    | Callback on date/time selection         |
+| `bodyColor`            | `string`                                 | `bg-white`      | Tailwind class for body background      |
+| `textColor`            | `string`                                 | `text-black`    | Tailwind class for text color           |
+| `buttonColor`          | `string`                                 | `bg-blue-500`   | Tailwind class for button color         |
+| `classname`            | `string`                                 | `py-4`          | Customized layout of date/time selector |
+| `iconColor`            | `string`                                 | `text-blue-500` | Tailwind class for icon color           |
+| `locale`               | `string`                                 | `en-US`         | Locale for formatting                   |
+| `dateFormat`           | `Intl.DateTimeFormatOptions`             | `{}`            | Custom date format                      |
+| `timeFormat`           | `Intl.DateTimeFormatOptions`             | `{}`            | Custom time format                      |
+| `firstDayOfWeek`       | `0 \| 1`                                 | `0` (Sunday)    | First day of the week                   |
+| `enableRangeSelection` | `boolean`                                | `false`         | Enable date range selection             |
+| `onRangeChange`        | `(start: Date, end: Date) => void`       | `undefined`     | Callback for range change               |
+| `initialEndDate`       | `Date`                                   | `undefined`     | Preselect end date in range mode        |
+| `minDate`              | `Date`                                   | `undefined`     | Minimum selectable date                 |
+| `maxDate`              | `Date`                                   | `undefined`     | Maximum selectable date                 |
+| `disabledDates`        | `Date[]`                                 | `[]`            | Dates to be disabled                    |
+| `timeZone`             | `string`                                 | User's TZ       | IANA time zone (e.g., 'Europe/Paris')   |
+| `showTimeZoneSelector` | `boolean`                                | `false`         | Show time zone selector dropdown        |
+| `customPresets`        | `{ label: string, value: () => Date }[]` | `[]`            | Predefined date presets                 |
+| `minuteInterval`       | `number`                                 | `1`             | Interval for time selection in minutes  |
+| `onHoverTextColor`     | `string`                                 | `black`         | Text color when hovering                |
+| `hoverColor`           | `string`                                 | `bg-gray-300`   | Background color on hover               |
 
 ## 🧪 Development & Testing
 
