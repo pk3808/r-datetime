@@ -3,7 +3,6 @@ import { createPortal } from 'react-dom';
 import { Clock, CalendarDays } from "lucide-react";
 import { ChevronRight } from 'lucide-react';
 
-
 type DateTimePickerProps = {
   initialDate?: Date;
   onChange?: (date: Date) => void;
@@ -33,10 +32,12 @@ type DateTimePickerProps = {
     label: string;
     value: Date | (() => Date);
   }>;
+  datePlaceholder?: string;
+  timePlaceholder?: string;
 };
 
 function DateTimePicker({
-  initialDate = new Date(),
+  initialDate,
   onChange,
   className = "",
   bodyColor = "bg-white",
@@ -55,33 +56,42 @@ function DateTimePicker({
     minute: "numeric",
     hour12: true,
   },
-  firstDayOfWeek = 0,
+  // firstDayOfWeek = 0,
   showPresetButtons,
   minuteInterval = 1,
   onHoverTextColor = "black",
   hoverColor = "bg-gray-300",
+  datePlaceholder = "--/--/----",
+  timePlaceholder = "--:-- --",
 }: DateTimePickerProps) {
-  const [date, setDate] = useState(initialDate);
+  const [date, setDate] = useState<Date | null>(initialDate || null);
   const [isOpen, setIsOpen] = useState(false);
   const [activeView, setActiveView] = useState<"date" | "time">("date");
+  const [hasUserSelected, setHasUserSelected] = useState(!!initialDate);
   const pickerRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLDivElement>(null);
   const modalRef = useRef<HTMLDivElement>(null);
 
   const actualIconColor = iconColor || textColor;
 
-  const formattedDate = new Intl.DateTimeFormat(locale, dateFormat).format(
-    date
-  );
-  const formattedTime = new Intl.DateTimeFormat(locale, timeFormat).format(
-    date
-  );
+  // For internal picker operations, use current date if no date is selected
+  const workingDate = date || new Date();
+
+  const formattedDate = hasUserSelected && date
+    ? new Intl.DateTimeFormat(locale, dateFormat).format(date)
+    : datePlaceholder;
+    
+  const formattedTime = hasUserSelected && date
+    ? new Intl.DateTimeFormat(locale, timeFormat).format(date)
+    : timePlaceholder;
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (
         pickerRef.current &&
-        !pickerRef.current.contains(event.target as Node)
+        !pickerRef.current.contains(event.target as Node) &&
+        modalRef.current &&
+        !modalRef.current.contains(event.target as Node)
       ) {
         setIsOpen(false);
       }
@@ -93,13 +103,12 @@ function DateTimePicker({
     };
   }, []);
 
-  useEffect(() => {
-    if (onChange && date.getTime() !== initialDate.getTime()) {
-      onChange(date);
-    }
-  }, [date, onChange, initialDate]);
+  // useEffect(() => {
+  //   if (onChange && date && hasUserSelected) {
+  //     onChange(date);
+  //   }
+  // }, [date, onChange, hasUserSelected]);
 
-  // This effect now correctly positions the modal using a portal
   useEffect(() => {
     const calculatePosition = () => {
       if (!isOpen || !inputRef.current || !modalRef.current) return;
@@ -114,9 +123,8 @@ function DateTimePicker({
       const modal = modalRef.current;
       modal.style.position = 'fixed';
       modal.style.left = `${inputRect.left}px`;
-      modal.style.zIndex = '9999999'; // Ensure it's on top
+      modal.style.zIndex = '9999999';
 
-      // Decide whether to render above or below the input
       if (spaceBelow < modalRect.height && spaceAbove > modalRect.height) {
         modal.style.top = `${inputRect.top - modalRect.height - 4}px`;
       } else {
@@ -125,10 +133,8 @@ function DateTimePicker({
     };
 
     if (isOpen) {
-      // Defer position calculation until after the modal has rendered
       requestAnimationFrame(() => {
         calculatePosition();
-        // Add listeners to reposition on scroll or resize
         window.addEventListener('scroll', calculatePosition, true);
         window.addEventListener('resize', calculatePosition);
       });
@@ -138,28 +144,32 @@ function DateTimePicker({
         window.removeEventListener('resize', calculatePosition);
       };
     }
-  }, [isOpen, activeView]); // Re-run if view changes, as modal height might change
+  }, [isOpen, activeView]);
 
   const handleDateChange = (newDate: Date) => {
-    const updatedDate = new Date(date);
-    updatedDate.setFullYear(newDate.getFullYear());
-    updatedDate.setMonth(newDate.getMonth());
-    updatedDate.setDate(newDate.getDate());
+  const updatedDate = date ? new Date(date) : new Date();
+  updatedDate.setFullYear(newDate.getFullYear());
+  updatedDate.setMonth(newDate.getMonth());
+  updatedDate.setDate(newDate.getDate());
 
-    if (updatedDate.getTime() !== date.getTime()) {
-      setDate(updatedDate);
-    }
-  };
+  setDate(updatedDate);
+  setHasUserSelected(true);
 
-  const handleTimeChange = (hours: number, minutes: number) => {
-    const updatedDate = new Date(date);
-    updatedDate.setHours(hours);
-    updatedDate.setMinutes(minutes);
+  // Call parent onChange here instead of useEffect
+  if (onChange) onChange(updatedDate);
+};
 
-    if (updatedDate.getTime() !== date.getTime()) {
-      setDate(updatedDate);
-    }
-  };
+const handleTimeChange = (hours: number, minutes: number) => {
+  const updatedDate = date ? new Date(date) : new Date();
+  updatedDate.setHours(hours);
+  updatedDate.setMinutes(minutes);
+
+  setDate(updatedDate);
+  setHasUserSelected(true);
+
+  // Call parent onChange here
+  if (onChange) onChange(updatedDate);
+};
 
   const togglePicker = (view?: "date" | "time") => {
     const targetView =
@@ -193,6 +203,9 @@ function DateTimePicker({
     ? buttonColor.replace("bg-", "border-")
     : "border-purple-700";
 
+  // Style for placeholder text
+  const placeholderStyle = !hasUserSelected ? "text-gray-400" : "";
+
   return (
     <div className="relative" ref={pickerRef}>
       <div
@@ -216,7 +229,7 @@ function DateTimePicker({
             }}
           >
             <CalendarDays size={18} className={actualIconColor} />
-            <span>{formattedDate}</span>
+            <span className={placeholderStyle}>{formattedDate}</span>
           </div>
         )}
         {mode === "datetime" && (
@@ -237,7 +250,7 @@ function DateTimePicker({
             }}
           >
             <Clock size={18} className={actualIconColor} />
-            <span>{formattedTime}</span>
+            <span className={placeholderStyle}>{formattedTime}</span>
           </div>
         )}
       </div>
@@ -245,7 +258,6 @@ function DateTimePicker({
       {isOpen && createPortal(
         <div
           ref={modalRef}
-          // Removed absolute positioning classes, now handled by inline styles
           className={`border border-gray-300 rounded-md shadow-lg w-72 ${activeView === "date" ? "h-82" : "h-48"
             } overflow-y-auto overflow-x-hidden ${bodyColor}`}
         >
@@ -253,8 +265,8 @@ function DateTimePicker({
             {mode !== "time" && (
               <button
                 className={`flex-1 py-2 text-center ${textColor} ${activeView === "date"
-                    ? `${activeTabColor} font-medium border-b-2 ${activeTabBorderColor}`
-                    : textColor
+                  ? `${activeTabColor} font-medium border-b-2 ${activeTabBorderColor}`
+                  : textColor
                   }`}
                 onClick={() => setActiveView("date")}
               >
@@ -264,8 +276,8 @@ function DateTimePicker({
             {mode !== "date" && (
               <button
                 className={`flex-1 py-2 text-center ${textColor} ${activeView === "time"
-                    ? `${activeTabColor} font-medium border-b-2 ${activeTabBorderColor}`
-                    : textColor
+                  ? `${activeTabColor} font-medium border-b-2 ${activeTabBorderColor}`
+                  : textColor
                   }`}
                 onClick={() => setActiveView("time")}
               >
@@ -276,7 +288,8 @@ function DateTimePicker({
           <div className="overflow-y-auto overflow-x-hidden h-[calc(100%-88px)]">
             {activeView === "date" ? (
               <DatePicker
-                date={date}
+                date={workingDate}
+                selectedDate={date}
                 onChange={handleDateChange}
                 textColor={textColor}
                 buttonColor={buttonColor}
@@ -286,7 +299,7 @@ function DateTimePicker({
               />
             ) : (
               <TimePicker
-                date={date}
+                date={workingDate}
                 onChange={handleTimeChange}
                 textColor={textColor}
                 bodyColor={bodyColor}
@@ -367,6 +380,7 @@ function DateTimePicker({
 
 type DatePickerProps = {
   date: Date;
+  selectedDate: Date | null;
   onChange: (date: Date) => void;
   bodyColor?: string;
   textColor?: string;
@@ -377,46 +391,26 @@ type DatePickerProps = {
 
 function DatePicker({
   date,
+  selectedDate,
   onChange,
   textColor = "text-gray-700",
   buttonColor = "bg-purple-700",
-  bodyColor = "bg-white",
+  // bodyColor = "bg-white",
   hoverColor = "bg-gray-100",
   onHoverTextColor = "text-gray-700",
 }: DatePickerProps) {
   const [viewDate, setViewDate] = useState(date);
-  const [selectedDate, setSelectedDate] = useState(date);
   const [showYearSelector, setShowYearSelector] = useState(false);
   const [showMonthSelector, setShowMonthSelector] = useState(false);
 
   const monthNames = [
-    "January",
-    "February",
-    "March",
-    "April",
-    "May",
-    "June",
-    "July",
-    "August",
-    "September",
-    "October",
-    "November",
-    "December",
+    "January", "February", "March", "April", "May", "June",
+    "July", "August", "September", "October", "November", "December",
   ];
 
   const monthNamesShort = [
-    "Jan",
-    "Feb",
-    "Mar",
-    "Apr",
-    "May",
-    "Jun",
-    "Jul",
-    "Aug",
-    "Sep",
-    "Oct",
-    "Nov",
-    "Dec",
+    "Jan", "Feb", "Mar", "Apr", "May", "Jun",
+    "Jul", "Aug", "Sep", "Oct", "Nov", "Dec",
   ];
 
   const currentYear = new Date().getFullYear();
@@ -451,7 +445,6 @@ function DatePicker({
 
   const handleDateClick = (day: number) => {
     const newDate = new Date(viewDate.getFullYear(), viewDate.getMonth(), day);
-    setSelectedDate(newDate);
     onChange(newDate);
   };
 
@@ -477,19 +470,9 @@ function DatePicker({
   };
 
   const getPrevMonthDays = () => {
-    const prevMonth = new Date(
-      viewDate.getFullYear(),
-      viewDate.getMonth() - 1,
-      1
-    );
-    const daysInPrevMonth = getDaysInMonth(
-      prevMonth.getFullYear(),
-      prevMonth.getMonth()
-    );
-    const firstDayOfMonth = getFirstDayOfMonth(
-      viewDate.getFullYear(),
-      viewDate.getMonth()
-    );
+    const prevMonth = new Date(viewDate.getFullYear(), viewDate.getMonth() - 1, 1);
+    const daysInPrevMonth = getDaysInMonth(prevMonth.getFullYear(), prevMonth.getMonth());
+    const firstDayOfMonth = getFirstDayOfMonth(viewDate.getFullYear(), viewDate.getMonth());
 
     const days: React.ReactElement[] = [];
     for (let i = 0; i < firstDayOfMonth; i++) {
@@ -507,7 +490,7 @@ function DatePicker({
   };
 
   const getNextMonthDays = (firstDayOfMonth: number, daysInMonth: number) => {
-    const totalCells = 42; // 6 rows of 7 days
+    const totalCells = 42;
     const remainingCells = totalCells - firstDayOfMonth - daysInMonth;
 
     const days: React.ReactElement[] = [];
@@ -524,7 +507,6 @@ function DatePicker({
     return days;
   };
 
-  // Compute hover classes
   const actualHoverBg = hoverColor
     ? `hover:${hoverColor}`
     : (buttonColor.startsWith("bg-")
@@ -539,21 +521,13 @@ function DatePicker({
 
   const renderCalendar = () => {
     const days: React.ReactElement[] = [];
-    const daysInMonth = getDaysInMonth(
-      viewDate.getFullYear(),
-      viewDate.getMonth()
-    );
-    const firstDayOfMonth = getFirstDayOfMonth(
-      viewDate.getFullYear(),
-      viewDate.getMonth()
-    );
+    const daysInMonth = getDaysInMonth(viewDate.getFullYear(), viewDate.getMonth());
+    const firstDayOfMonth = getFirstDayOfMonth(viewDate.getFullYear(), viewDate.getMonth());
 
-    // Add previous month days
     days.push(...getPrevMonthDays());
 
-    // Add current month days
     for (let day = 1; day <= daysInMonth; day++) {
-      const isSelected =
+      const isSelected = selectedDate &&
         selectedDate.getDate() === day &&
         selectedDate.getMonth() === viewDate.getMonth() &&
         selectedDate.getFullYear() === viewDate.getFullYear();
@@ -575,9 +549,7 @@ function DatePicker({
       );
     }
 
-    // Add next month days to fill the grid
     days.push(...getNextMonthDays(firstDayOfMonth, daysInMonth));
-
     return days;
   };
 
@@ -656,7 +628,6 @@ function DatePicker({
             </div>
           ))}
         </div>
-
         <div className="grid grid-cols-7 gap-1">{renderCalendar()}</div>
       </>
     );
@@ -665,15 +636,12 @@ function DatePicker({
   return (
     <div className="p-4">
       <div className="flex justify-between items-center mb-4">
-        <button
-          onClick={handlePrevMonth}
-          className={`${textColor} `}
-        >
+        <button onClick={handlePrevMonth} className={`${textColor}`}>
           &lt;
         </button>
         <div className="flex items-center space-x-1">
           <span
-            className={`font-medium cursor-pointer ${textColor} `}
+            className={`font-medium cursor-pointer ${textColor}`}
             onClick={toggleMonthSelector}
           >
             {monthNames[viewDate.getMonth()]}
@@ -685,14 +653,10 @@ function DatePicker({
             {viewDate.getFullYear()}
           </span>
         </div>
-        <button
-          onClick={handleNextMonth}
-          className={`${textColor}`}
-        >
+        <button onClick={handleNextMonth} className={`${textColor}`}>
           &gt;
         </button>
       </div>
-
       {renderSelector()}
     </div>
   );
@@ -777,14 +741,11 @@ function TimePicker({
     }
   };
 
-  // Hover classes for select elements
   const hoverBgClass = hoverColor ? `hover:${hoverColor}` : 'hover:bg-gray-200';
   const hoverTextClass = onHoverTextColor ? `hover:${onHoverTextColor}` : 'hover:text-blue-600';
   const hoverClasses = `${hoverBgClass} ${hoverTextClass}`;
 
-
   const selectClassName = `p-2 focus:outline-none focus:ring-2 focus:ring-transparent border rounded-lg text-center appearance-none w-24 text-lg font-medium ${textColor} ${bodyColor} ${hoverClasses} cursor-pointer transition-colors duration-300 ease-in-out`;
-
 
   return (
     <div className="p-6">
